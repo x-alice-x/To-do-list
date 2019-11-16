@@ -1,28 +1,67 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="container">
+    <header v-show="state == 'todo-list'">
+      <div class="header-right">
+        <a href="#">ToDo-list</a>
+        <p>{{userName}}</p>
+      </div>
+      <a href="#" @click="exit">Выйти</a>
+    </header>
+    <auth v-if="state == 'start'"
+          @authComplete="authComplete">        
+    </auth>
+    <todo-list v-else-if="state == 'todo-list'"></todo-list>
+    
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import todoList from './components/todo-list.vue'
+import auth from './components/authorization.vue'
 
 export default {
   name: 'app',
   components: {
-    HelloWorld
+    todoList,
+    auth
+  },
+  data() {
+    return {
+      state: 'start',
+      userName: ''
+    }
+  },
+  methods: {
+    authComplete(userName) {
+      this.state = 'todo-list';
+      this.userName = userName;
+    },
+    exit() {
+      this.state = 'start'
+    }
   }
 }
 </script>
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style scoped>
+  header {
+    display: flex;
+    justify-content: space-around;
+    background-color: #333333;
+    background-size: 500px;
+    color: #fff;
+    padding-top: 15px;
+  }
+  .header-right p {
+    margin-left: 15px;
+  }  
+
+  .header-right {
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .header-right a{
+    margin-right: 20px;  
+  }
 </style>
