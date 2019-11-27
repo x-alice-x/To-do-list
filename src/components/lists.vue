@@ -42,17 +42,14 @@
     data() {
       return {
         Filter: '',
-        filtred: [],
-        i: 0
+        filtred: []
       }
     },
     computed: {
       filtredLists() {
-        // return this.arrayList.filter((list) => {
-        //   return String(list.selected).match(this.Filter);
-        // });
-        this.i = this.i + 10;
-        return this.arrayList;
+        return this.arrayList.filter((list) => {
+          return String(list.selected).match(this.Filter);
+        });
       }
     },
     watch: {      
