@@ -1,129 +1,83 @@
 <template>
   <div id="app">
-    <b-modal
-      id="plus-list"
-      ref="modal"
-      title="Add a new list"
-      @show="resetModal"
-      @hidden="resetModal"
-      @ok="handleOk"
-    >
-      <form ref="form" @submit.stop.prevent="createNewList">
-        <b-form-group
-          :state="nameState"
-          label="Enter name of list"
-          label-for="name-input"
-          invalid-feedback="Name is required"
-        >
-          <b-form-input
-            id="name-input"
-            v-model="name"
-            :state="nameState"
-            required
-            placeholder=''
-          ></b-form-input>
-        </b-form-group>
-      </form>
-    </b-modal>
-    <b-modal
-      id="plus-case"
-      ref="modal"
-      title="Add a new case"
-      @show="resetModalCase"
-      @hidden="resetModalCase"
-      @ok="handleOkCase"
-    >
-      <form ref="form" @submit.stop.prevent="createNewCase">
-        <b-form-group
-          :state="nameStateCase"
-          label="Enter name of case"
-          label-for="name-input"
-          invalid-feedback="Name is required"
-          placeholder=''
-        >
-          <b-form-input
-            id="name-input"
-            v-model="nameCase"
-            :state="nameStateCase"
-            required
-          ></b-form-input>
-          <b-form-checkbox
-            id="checkbox-1"
-            v-model="urgency"
-            name="checkbox-1""
-          >
-            <b-form-label>
-              Urgency
-            </b-form-label>
-          </b-form-checkbox>
-        </b-form-group>
-      </form>
-    </b-modal>
+    <modal 
+      :label="labelCreateList"
+      :title="titleCreateList"
+      :modalId="modalIdCreateList"
+      :visibleCheckbox='0'
+      @action="createNewList" 
+      @handleAction="createNewList">  
+    </modal>
+    <modal 
+      :label="labelCreateCase"
+      :title="titleCreateCase"
+      :modalId="modalIdCreateCase"
+      :visibleCheckbox='1'
+      @action="createNewCase" 
+      @handleAction="createNewCase">  
+    </modal>
+    <modal 
+      :label="labelEditList"
+      :title="titleEditList"
+      :modalId="modalIdEditList"
+      :visibleCheckbox='0'
+      @action="editList" 
+      @handleAction="editList">  
+    </modal>
+    <modal 
+      :label="labelEditCase"
+      :title="titleEditCase"
+      :modalId="modalIdEditCase"
+      :visibleCheckbox='0'
+      @action="editCase" 
+      @handleAction="editCase">  
+    </modal>
     <div class="interface">
-      <div class="todo-list">
-        <div class="top">
-          <div class="form-group">
-              <select class="form-control" id="exampleFormControlSelect1"
-                      v-model="Filter">
-                <option value="">Все</option>
-                <option value="false">Неисполненные</option>
-                <option value="true">Исполненные</option>
-              </select>
-          </div>
-          <hr>
-          <ul class="list-group">
-            <li class="list-group-item"
-              v-for="(result, index) in filtredLists"
-              :class="{white: !result.arrayCase.length,
-                      green: !result.selected, 
-                      grey: result.selected}" 
-              v-on:click="openList(index)">
-              <p>{{ result.name }}</p>
-              <div class="btns-edit">
-                <button class="edit" @click="editList(index)"><img src="./icons/edit_icon.png"></button>
-                <button class="edit" @click="deleteList(index)"><img src="./icons/delete_icon.png"></button>
-              </div>
-            </li>
-          </ul>
-        </div>
-        <b-button class="plus-list" v-b-modal.plus-list>
-          <h3>+</h3>
-        </b-button>
-      </div>
-      <div class="details">
-        <div class="details-top">
-          <h3>{{ listName }}</h3>
-          <hr>
-          <ul class="list-group">
-            <li class="list-group-item"
-              v-for="(result, index) in arrayList[indexList].arrayCase">
-              <input v-model="result.doneStatus"
-                     class="check-case" type="checkbox" name="done" 
-                     @click="checkCase(index)">
-                <img class="urgency-ico" src="./icons/urgency.png" 
-                     v-show="result.urgencyStatus">
-                <p>{{ result.name }}</p>
-              <div class="btns-edit">
-                <button class="edit" @click="editCase(index)"><img src="./icons/edit_icon.png"></button>
-                <button class="edit" @click="deleteCase(index)"><img src="./icons/delete_icon.png"></button>
-              </div>
-            </li>
-          </ul>
-        </div>
-        <b-button class="plus-case" v-b-modal.plus-case>
-          <h3>+</h3>
-        </b-button>
-      </div>
+      <lists 
+        :arrayList="arrayList"
+        @getFiltred="existList"
+        @deleteList="deleteList"
+        @openList="openList">
+      </lists>
+      <cases
+        :existList="existListAr"
+        :existNameList="existNameListAr"
+        :noList="noList"
+        :visiblePlusCase="visiblePlusCase"
+        @deleteCase="deleteCase"
+        @openCase="openCase"
+        @checkCase="checkCase">
+      </cases>
     </div>
   </div>
 </template>
 
 <script>
   import $ from 'jquery'
+  import modal from './modal.vue'
+  import lists from './lists.vue'
+  import cases from './cases.vue'
   export default {
     name: 'todo-list',
+    components: {
+      modal,
+      lists,
+      cases
+    },
     data() {
       return {
+        modalIdCreateList: 'plus-list',
+        titleCreateList: 'Add the new list',
+        labelCreateList: 'Enter the name of the new list',
+        modalIdCreateCase: 'plus-case',
+        titleCreateCase: 'Add the new case',
+        labelCreateCase: 'Enter the name of the new case',
+        modalIdEditList: 'edit-list',
+        titleEditList: 'Edit the list',
+        labelEditList: 'Enter the new name of the list',
+        modalIdEditCase: 'edit-case',
+        titleEditCase: 'Edit the case',
+        labelEditCase: 'Enter the new name of the case',
         name: '',
         nameState: null,
         nameCase: '',
@@ -136,6 +90,7 @@
         arrayList: [
         {
           name: 'Go to the shop',
+          listId: 0,
           selected: false,
           arrayCase: [
           {
@@ -160,6 +115,7 @@
         },
         {
           name: 'Make a homework',
+          listId: 1,
           selected: false,
           arrayCase: [
           {
@@ -176,161 +132,206 @@
           },
           ]
         },
-        ]
+        ],
+        emptyList: {
+          name: 'You have no list here'
+        },
+        noList: false,
+        visiblePlusCase: true,
+        filtredLists: [],
+        existListAr: [],
+        existNameListAr: []
       }
     },
-    computed: {
-      filtredLists() {
-        return this.arrayList.filter((list) => {
-          return String(list.selected).match(this.Filter);
-        });
-      }
-    },
+    // computed: {
+    //   filtredLists() {
+    //     return this.arrayList.filter((list) => {
+    //       return String(list.selected).match(this.Filter);
+    //     });
+    //   }
+    // },
+      // existList() {
+      //   console.log('exist ' + this.filtredLists);
+      //   if (this.filtredLists.length) {
+      //     this.noList = false;
+      //     this.visiblePlusCase = true;
+      //     this.existListAr = this.filtredLists[this.indexList].arrayCase;
+      //     this.existNameListAr = this.filtredLists[this.indexList];
+      //     console.log(this.existNameListAr)
+      //     // return this.filtredLists[this.indexList].arrayCase;
+      //   }
+      //   else {
+      //     this.noList = true;
+      //     this.visiblePlusCase = false;
+      //     this.existListAr = this.emptyList;
+      //     this.existNameListAr = this.emptyList;
+      //     // return this.emptyList;
+      //   }
+      // }
+    // },
     methods: {
-      checkFormValidity() {
-        const valid = this.$refs.form.checkValidity()
-        this.nameState = valid ? 'valid' : 'invalid'
-        return valid
-      },
-      resetModal() {
-        this.name = ''
-        this.nameState = null
-      },
-      handleOk(bvModalEvt) {
-        // Prevent modal from closing
-        bvModalEvt.preventDefault()
-        // Trigger submit handler
-        this.createNewList()
-      },
-      resetModalCase() {
-        this.name = ''
-        this.nameStateCase = null
-      },
-      handleOkCase(bvModalEvt) {
-        // Prevent modal from closing
-        bvModalEvt.preventDefault()
-        // Trigger submit handler
-        this.createNewCase()
-      },
-      handleSubmit() {
-        // Exit when the form isn't valid
-        if (!this.checkFormValidity()) {
-          return
-        }
-        // Push the name to submitted names
-        this.arrayList.push({name: this.name})
-        // Hide the modal manually
-        this.$nextTick(() => {
-          this.$refs.modal.hide()
-        })
-      },
-      checkCase(index) {// чтобы изменялись состояния в объекте
-        this.indexCase = index;
-        if (this.arrayList[this.indexList].arrayCase[index].doneStatus  == false) {
-          this.arrayList[this.indexList].arrayCase[index].doneStatus = true;
+      existList(filtredLists) {
+        // this.filtredLists = JSON.parse(JSON.stringify(filtredLists))
+        this.filtredLists = filtredLists;
+        console.log('exist ' + this.filtredLists);
+        if (this.filtredLists.length) {
+          this.noList = false;
+          this.visiblePlusCase = true;
+          this.existListAr = this.filtredListsAr[this.indexList].arrayCase;
+          this.existNameListAr = this.filtredListsAr[this.indexList];
+          console.log(this.existNameListAr)
+          // return this.filtredLists[this.indexList].arrayCase;
         }
         else {
-          this.arrayList[this.indexList].arrayCase[index].doneStatus = false;
+          this.noList = true;
+          this.visiblePlusCase = false;
+          this.existListAr = this.emptyList;
+          this.existNameListAr = this.emptyList;
+          // return this.emptyList;
+        }
+      },
+      checkCase(index) {
+        this.indexCase = index;
+        if (this.filtredLists[this.indexList].arrayCase[index].doneStatus  == false) {
+          this.filtredLists[this.indexList].arrayCase[index].doneStatus = true;
+        }
+        else {
+          this.filtredLists[this.indexList].arrayCase[index].doneStatus = false;
         }
         let countCheked = 0;
-        for (let i = 0; i < this.arrayList[this.indexList].arrayCase.length; i++) {
-          if (this.arrayList[this.indexList].arrayCase[i].doneStatus) {
+        for (let i = 0; i < this.filtredLists[this.indexList].arrayCase.length; i++) {
+          if (this.filtredLists[this.indexList].arrayCase[i].doneStatus) {
             countCheked++;          
           }
         }
-        if (countCheked == this.arrayList[this.indexList].arrayCase.length) {
+        if (countCheked == this.filtredLists[this.indexList].arrayCase.length) {
           console.log('return true');
-          this.arrayList[this.indexList].selected = true;
+          this.filtredLists[this.indexList].selected = true;
         }
         else {
           console.log('return false');
-          this.arrayList[this.indexList].selected = false;
+          this.filtredLists[this.indexList].selected = false;
         }
       },
-      createNewCase() {
-        for (let i = 0; i < this.arrayList[this.indexList].arrayCase.length; i++)
-          if (this.nameCase == this.arrayList[this.indexList].arrayCase[i].name) {
+      createNewCase(name, urgency) {
+        this.nameCase = name;
+        this.urgency = urgency;
+        for (let i = 0; i < this.filtredLists[this.indexList].arrayCase.length; i++)
+          if (this.nameCase == this.filtredLists[this.indexList].arrayCase[i].name) {
             toastr.error('This name is already exist');
             return false;
           }
         if (this.nameCase.length > 30) 
-          toastr.error('Length of name must be lower than 30 symbols!');
+          toastr.error('Length of the name must be lower than 30 symbols!');
         else if (!this.nameCase.length)
-          toastr.error('Enter name of list!');
+          toastr.error('Enter the name of the list!');
         else {
-          this.arrayList[this.indexList].selected = false;
+          this.filtredLists[this.indexList].selected = false;
+          let dateCase = new Date();
+          dateCase = dateCase.getDate() + '.' + (dateCase.getMonth()+1) + '.' 
+                    + dateCase.getFullYear() + ', ' 
+                    + dateCase.getHours() + ':' + dateCase.getMinutes();
+          console.log(dateCase);
           if (this.urgency) {
-            this.arrayList[this.indexList].arrayCase.push({
+            this.filtredLists[this.indexList].arrayCase.push({
               name: this.nameCase,
-              date: '12',
+              date: dateCase,
               urgencyStatus: true,
               doneStatus: false
             });
           }
           else {
-            this.arrayList[this.indexList].arrayCase.push({
+            this.filtredLists[this.indexList].arrayCase.push({
               name: this.nameCase,
-              date: '12',
+              date: dateCase,
               urgencyStatus: false,
               doneStatus: false
             });
           }
           toastr.success('Case "'+ this.nameCase + '" was added');
-          this.$nextTick(() => {
-            this.$refs.modal.hide()
-          });
           this.nameCase = '';
         }
       },
-      createNewList() {
-        if (!this.checkFormValidity()) {
-          return
-        }
+      createNewList(name) {
+        this.name = name;
         for (let i = 0; i < this.arrayList.length; i++)
           if (this.name == this.arrayList[i].name) {
             toastr.error('This name is already exist');
             return false;
           }
         if (this.name.length > 30)
-          toastr.error('Length of name must be lower than 30 symbols!');
+          toastr.error('Length of the name must be lower than 30 symbols!');
         else if (!this.name.length)
-          toastr.error('Enter name of list!');
+          toastr.error('Enter the name of the list!');
         else {
-          this.arrayList.push({name: this.name, arrayCase: []});
+          let listId = this.arrayList.length;
+          this.arrayList.push({name: this.name, listId: listId,  arrayCase: []});
+          this.indexList = this.arrayList.length - 1;
+          this.listName = this.arrayList[this.indexList].name;
           toastr.success('To do list "'+ this.name + '" was added');
-          this.$nextTick(() => {
-            this.$refs.modal.hide()
-          })
         }
       },
       deleteList(index) {
-        if (confirm('Delete list "' + this.arrayList[index].name + '"?')) {
-          this.$delete(this.arrayList, index);
+        console.log(this.filtredLists)
+        if (confirm('Delete list "' + this.filtredLists[index].name + '"?')) {
+          let listId = this.filtredLists[index].listId;
+          let indexList;
+          this.indexList = index;
+          console.log(listId);
+          for (let i = 0; i < this.arrayList.length; i++) {
+            if (listId == this.arrayList[i].listId) {
+              indexList = i;
+            }
+          }
+          if (this.arrayList.length == 1) {
+            this.$delete(this.arrayList, indexList);
+            console.log(this.arrayList);
+          }
+          else {
+            if (this.indexList == index) {
+              if (index > 0)
+                this.indexList = index - 1;
+            }
+            this.$delete(this.arrayList, indexList);
+          }
         }
       },
-      editList(index) {
-        let listName = prompt('Edit a name of case', this.arrayList[index].name);
-        this.arrayList[index].name = listName;
+      editList(name) {
+        let nameEditList = name;
+        if (nameEditList.length)
+          this.filtredLists[this.indexList].name = nameEditList;
       },
       deleteCase(index) {
-        if (confirm('Delete case "' + this.arrayList[this.indexList].arrayCase[index].name 
-                      + '" from "' + this.arrayList[this.indexList].name + '"?')) {
-          this.$delete(this.arrayList[this.indexList].arrayCase, index);
+        if (confirm('Delete case "' + this.filtredLists[this.indexList].arrayCase[index].name + '" from "' + this.filtredLists[this.indexList].name + '"?')) {
+          this.$delete(this.filtredLists[this.indexList].arrayCase, index);
         }
       },
-      editCase(index) {
-        let caseName = prompt('Edit a name of case', this.arrayList[this.indexList].arrayCase[index].name);
-        this.arrayList[this.indexList].arrayCase[index].name = caseName;
+      editCase(name) {
+        let nameEditCase = name;
+        if (nameEditCase.length) {
+          this.filtredLists[this.indexList].arrayCase[this.indexCase].name = nameEditCase;
+        }
+
       },
       openList(index) {
-        this.listName = this.arrayList[index].name;
-        this.visibleBtnPlusCase = true;
+        if (event.target.id == 'icon_del')
+          return false;
         this.indexList = index;
+
+        // console.log(this.arrayList)
+        // console.log(this.filtredLists);
+        console.log(this.existNameListAr);
+      },
+      openCase(index) {
+       if (event.target.id == 'icon_del')
+          return false;
+        
+        this.indexCase = index; 
       }
     }
   }
 </script>
-<style scoped>
+<style>
 
   .urgency-ico {
     margin-right: 10px;
