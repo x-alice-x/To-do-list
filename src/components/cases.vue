@@ -1,7 +1,8 @@
 <template>
   <div class="details">
     <div class="details-top">
-      <h3>{{ existNameList.name }}</h3>
+      <h3 v-if="existNameList.length!=0">{{ existNameList.name }}</h3>
+      <h3 v-if="existNameList.length==0">{{ chooseList }}</h3>
       <hr>
       <ul class="list-group">
         <li class="list-group-item"
@@ -38,6 +39,7 @@
     },
     data() {
       return {
+        chooseList: 'Choose the list'
       }
     },
     methods: {

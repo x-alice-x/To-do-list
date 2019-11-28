@@ -41,8 +41,7 @@
     },
     data() {
       return {
-        Filter: '',
-        filtred: []
+        Filter: ''
       }
     },
     computed: {
@@ -54,10 +53,7 @@
     },
     watch: {      
       filtredLists(newValue, oldValue) {
-        this.filtred = this.filtredLists
-        console.log(this.filtred)
-        this.$emit('getFiltred', this.filtred)
-        // this.$parent.$arrayList;
+        this.$emit('getFiltred', this.filtredLists)
       }
     },
     methods: {
@@ -65,7 +61,7 @@
         this.$emit('deleteList', index)
       },
       openList(index) {
-        this.$emit('openList', index)
+        this.$emit('openList', index, this.filtredLists)
       }
     }
 	}

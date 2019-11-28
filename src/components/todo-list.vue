@@ -143,51 +143,21 @@
         existNameListAr: []
       }
     },
-    // computed: {
-    //   filtredLists() {
-    //     return this.arrayList.filter((list) => {
-    //       return String(list.selected).match(this.Filter);
-    //     });
-    //   }
-    // },
-      // existList() {
-      //   console.log('exist ' + this.filtredLists);
-      //   if (this.filtredLists.length) {
-      //     this.noList = false;
-      //     this.visiblePlusCase = true;
-      //     this.existListAr = this.filtredLists[this.indexList].arrayCase;
-      //     this.existNameListAr = this.filtredLists[this.indexList];
-      //     console.log(this.existNameListAr)
-      //     // return this.filtredLists[this.indexList].arrayCase;
-      //   }
-      //   else {
-      //     this.noList = true;
-      //     this.visiblePlusCase = false;
-      //     this.existListAr = this.emptyList;
-      //     this.existNameListAr = this.emptyList;
-      //     // return this.emptyList;
-      //   }
-      // }
-    // },
     methods: {
       existList(filtredLists) {
-        // this.filtredLists = JSON.parse(JSON.stringify(filtredLists))
         this.filtredLists = filtredLists;
         console.log('exist ' + this.filtredLists);
         if (this.filtredLists.length) {
           this.noList = false;
           this.visiblePlusCase = true;
-          this.existListAr = this.filtredListsAr[this.indexList].arrayCase;
-          this.existNameListAr = this.filtredListsAr[this.indexList];
-          console.log(this.existNameListAr)
-          // return this.filtredLists[this.indexList].arrayCase;
+          this.existListAr = this.filtredLists[this.indexList].arrayCase;
+          this.existNameListAr = this.filtredLists[this.indexList];
         }
         else {
           this.noList = true;
           this.visiblePlusCase = false;
           this.existListAr = this.emptyList;
           this.existNameListAr = this.emptyList;
-          // return this.emptyList;
         }
       },
       checkCase(index) {
@@ -205,11 +175,9 @@
           }
         }
         if (countCheked == this.filtredLists[this.indexList].arrayCase.length) {
-          console.log('return true');
           this.filtredLists[this.indexList].selected = true;
         }
         else {
-          console.log('return false');
           this.filtredLists[this.indexList].selected = false;
         }
       },
@@ -265,7 +233,7 @@
           toastr.error('Enter the name of the list!');
         else {
           let listId = this.arrayList.length;
-          this.arrayList.push({name: this.name, listId: listId,  arrayCase: []});
+          this.arrayList.push({name: this.name, selected: false, listId: listId,  arrayCase: []});
           this.indexList = this.arrayList.length - 1;
           this.listName = this.arrayList[this.indexList].name;
           toastr.success('To do list "'+ this.name + '" was added');
@@ -277,7 +245,6 @@
           let listId = this.filtredLists[index].listId;
           let indexList;
           this.indexList = index;
-          console.log(listId);
           for (let i = 0; i < this.arrayList.length; i++) {
             if (listId == this.arrayList[i].listId) {
               indexList = i;
@@ -285,7 +252,6 @@
           }
           if (this.arrayList.length == 1) {
             this.$delete(this.arrayList, indexList);
-            console.log(this.arrayList);
           }
           else {
             if (this.indexList == index) {
@@ -313,14 +279,11 @@
         }
 
       },
-      openList(index) {
+      openList(index, filtredLists) {
         if (event.target.id == 'icon_del')
           return false;
         this.indexList = index;
-
-        // console.log(this.arrayList)
-        // console.log(this.filtredLists);
-        console.log(this.existNameListAr);
+        this.existList(filtredLists);
       },
       openCase(index) {
        if (event.target.id == 'icon_del')

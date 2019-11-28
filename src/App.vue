@@ -37,6 +37,7 @@ export default {
       this.userName = userName;
     },
     exit() {
+      this.$store.dispatch('SIGNOUT')
       this.state = 'start'
     }
   }
