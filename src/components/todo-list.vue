@@ -87,52 +87,53 @@
         listName: 'Go to the shop',
         indexList: 0,
         indexCase: 0,
-        arrayList: [
-        {
-          name: 'Go to the shop',
-          listId: 0,
-          selected: false,
-          arrayCase: [
-          {
-            name: 'Buy milk',
-            date: '',
-            doneStatus: false,
-            urgencyStatus: false
-          },
-          {
-            name: 'Buy sugar',
-            date: '',
-            doneStatus: false,
-            urgencyStatus: false
-          },
-          {
-            name: 'Buy bread',
-            date: '',
-            doneStatus: false,
-            urgencyStatus: false
-          },
-          ]
-        },
-        {
-          name: 'Make a homework',
-          listId: 1,
-          selected: false,
-          arrayCase: [
-          {
-            name: 'Math',
-            date: '',
-            doneStatus: false,
-            urgencyStatus: false
-          },
-          {
-            name: 'History',
-            date: '',
-            doneStatus: false,
-            urgencyStatus: false
-          },
-          ]
-        },
-        ],
+        listId: 1,
+        // arrayList: [
+        // {
+        //   name: 'Go to the shop',
+        //   listId: 0,
+        //   selected: false,
+        //   arrayCase: [
+        //   {
+        //     name: 'Buy milk',
+        //     date: '',
+        //     doneStatus: false,
+        //     urgencyStatus: false
+        //   },
+        //   {
+        //     name: 'Buy sugar',
+        //     date: '',
+        //     doneStatus: false,
+        //     urgencyStatus: false
+        //   },
+        //   {
+        //     name: 'Buy bread',
+        //     date: '',
+        //     doneStatus: false,
+        //     urgencyStatus: false
+        //   },
+        //   ]
+        // },
+        // {
+        //   name: 'Make a homework',
+        //   listId: 1,
+        //   selected: false,
+        //   arrayCase: [
+        //   {
+        //     name: 'Math',
+        //     date: '',
+        //     doneStatus: false,
+        //     urgencyStatus: false
+        //   },
+        //   {
+        //     name: 'History',
+        //     date: '',
+        //     doneStatus: false,
+        //     urgencyStatus: false
+        //   },
+        //   ]
+        // },
+        // ],
         emptyList: {
           name: 'You have no list here'
         },
@@ -141,6 +142,18 @@
         filtredLists: [],
         existListAr: [],
         existNameListAr: []
+      }
+    },
+    computed: {
+      arrayList() {
+        console.log('arrayList ' + this.$store.getters.getArrayList)
+        return this.$store.getters.getArrayList
+      }
+    },
+    watch: {
+      arrayList(newValue, oldValue) {
+        console.log('watch')
+        this.$store.dispatch('ADD_USER_LISTS', this.arrayList)
       }
     },
     methods: {
@@ -176,10 +189,12 @@
         }
         if (countCheked == this.filtredLists[this.indexList].arrayCase.length) {
           this.filtredLists[this.indexList].selected = true;
+          this.$store.dispatch('ADD_USER_LISTS', this.arrayList)
         }
         else {
           this.filtredLists[this.indexList].selected = false;
         }
+
       },
       createNewCase(name, urgency) {
         this.nameCase = name;
@@ -218,6 +233,7 @@
           }
           toastr.success('Case "'+ this.nameCase + '" was added');
           this.nameCase = '';
+          this.$store.dispatch('ADD_USER_LISTS', this.arrayList)
         }
       },
       createNewList(name) {
@@ -232,8 +248,8 @@
         else if (!this.name.length)
           toastr.error('Enter the name of the list!');
         else {
-          let listId = this.arrayList.length;
-          this.arrayList.push({name: this.name, selected: false, listId: listId,  arrayCase: []});
+          this.listId += 1;
+          this.arrayList.push({name: this.name, selected: false, listId: this.listId,  arrayCase: []});
           this.indexList = this.arrayList.length - 1;
           this.listName = this.arrayList[this.indexList].name;
           toastr.success('To do list "'+ this.name + '" was added');
@@ -270,12 +286,14 @@
       deleteCase(index) {
         if (confirm('Delete case "' + this.filtredLists[this.indexList].arrayCase[index].name + '" from "' + this.filtredLists[this.indexList].name + '"?')) {
           this.$delete(this.filtredLists[this.indexList].arrayCase, index);
+          this.$store.dispatch('ADD_USER_LISTS', this.arrayList)
         }
       },
       editCase(name) {
         let nameEditCase = name;
         if (nameEditCase.length) {
           this.filtredLists[this.indexList].arrayCase[this.indexCase].name = nameEditCase;
+          this.$store.dispatch('ADD_USER_LISTS', this.arrayList)
         }
 
       },
@@ -283,6 +301,7 @@
         if (event.target.id == 'icon_del')
           return false;
         this.indexList = index;
+        console.log(this.arrayList[index].listId)
         this.existList(filtredLists);
       },
       openCase(index) {

@@ -34,9 +34,6 @@
     	check() {
     		this.$store.dispatch('SIGNIN', 
     			{email: this.userName, password: this.password})
-    		if (this.isUserAuthenticated) {
-    			this.$emit('authComplete', this.userName)
-    		}
     	}
     }
 }
